@@ -1,0 +1,418 @@
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        :root {
+            --light-color: #c4d5df;
+            --dark-color: #7195ab;
+        }
+
+        * {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            padding: 0px;
+            margin: 0px;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #123;
+        }
+
+        div {
+            padding: 0px;
+            margin: 0px;
+            display: inline-block;
+        }
+
+        .wrap {
+            position: relative;
+            width: 80vmin;
+            height: 85vmin;
+        }
+
+        .board {
+            position: relative;
+            width: 80vmin;
+            height: 80vmin;
+        }
+
+        .square {
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            width: 12.5%;
+            height: 12.5%;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .square.light {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .square.dark {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+        }
+
+        .piece {
+            position: absolute;
+            left: 5%;
+            top: 5%;
+            width: 90%;
+            height: 90%;
+        }
+
+        .piece>svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .score {
+            width: 80vmin;
+            height: 5vmin;
+            padding: 1vmin;
+            font-size: 3vmin;
+            color: var(--light-color);
+            display: flex;
+        }
+
+        .score div {
+            flex: 0.3333;
+            text-align: center;
+        }
+
+        .score div:last-child {
+            text-align: right;
+        }
+
+        .score div:first-child {
+            text-align: left;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            background-color: rgba(255, 255, 255, 0.3);
+            font-size: 3vmin;
+            padding: 20vmin 5vmin;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .overlay #status {
+            font-size: 6vmin;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        const INITIAL_Q_SQUARE = 'D5'
+        const INITIAL_N_SQUARE = 'H8'
+        const ATTR_LABEL = 'attr-label'
+        const ATTR_ROW = 'attr-row'
+        const ATTR_COL = 'attr-col'
+        const BOARD_SIZE = 8
+        const getRange = (n) => new Array(n).fill(undefined).map((_, i) => i)
+        const rowLabels = getRange(BOARD_SIZE).map((i) => (i + 1).toString())
+        const colLabels = getRange(BOARD_SIZE).map((i) => String.fromCharCode(0x41 + i))
+        const getSquareLabel = (row, col) => colLabels[col] + rowLabels[row]
+
+        const selectBoardElement = () => {
+            return document.querySelector('.board')
+        }
+
+        const buildSquareElement = (row, col) => {
+            const label = getSquareLabel(row, col)
+
+            const el = document.createElement('div')
+            el.className = 'square ' + ((row - col) % 2 === 0 ? 'dark' : 'light')
+            el.innerText = label
+            el.ontap = el.onclick = tryToMove
+            el.setAttribute(ATTR_LABEL, label)
+            el.setAttribute(ATTR_ROW, row)
+            el.setAttribute(ATTR_COL, col)
+
+            return el
+        }
+
+        const selectSquare = (square) => document.querySelector(`.square[attr-label=${square}]`)
+
+        const buildBlackQueen = () => `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 45 45">
+            <g style="opacity:1; fill:#000000; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;">
+                <g style="fill:#000000; stroke:none;">
+                    <circle cx="6" cy="12" r="2.75" />
+                    <circle cx="14" cy="9" r="2.75" />
+                    <circle cx="22.5" cy="8" r="2.75" />
+                    <circle cx="31" cy="9" r="2.75" />
+                    <circle cx="39" cy="12" r="2.75" />
+                </g>
+                <path d="M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z" style="stroke-linecap:butt; stroke:#000000;" />
+                <path d="M 9,26 C 9,28 10.5,28 11.5,30 C 12.5,31.5 12.5,31 12,33.5 C 10.5,34.5 11,36 11,36 C 9.5,37.5 11,38.5 11,38.5 C 17.5,39.5 27.5,39.5 34,38.5 C 34,38.5 35.5,37.5 34,36 C 34,36 34.5,34.5 33,33.5 C 32.5,31 32.5,31.5 33.5,30 C 34.5,28 36,28 36,26 C 27.5,24.5 17.5,24.5 9,26 z" style="stroke-linecap:butt;" />
+                <path d="M 11,38.5 A 35,35 1 0 0 34,38.5" style="fill:none; stroke:#000000; stroke-linecap:butt;" />
+                <path d="M 11,29 A 35,35 1 0 1 34,29" style="fill:none; stroke:#ffffff;" />
+                <path d="M 12.5,31.5 L 32.5,31.5" style="fill:none; stroke:#ffffff;" />
+                <path d="M 11.5,34.5 A 35,35 1 0 0 33.5,34.5" style="fill:none; stroke:#ffffff;" />
+                <path d="M 10.5,37.5 A 35,35 1 0 0 34.5,37.5" style="fill:none; stroke:#ffffff;" />
+            </g>
+        </svg>`
+
+        const buildWhiteKnight = () => `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 45 45">
+            <g style="opacity:1; fill:none; fill-opacity:1; fill-rule:evenodd; stroke:#000000; stroke-width:1.5; stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;">
+                <path
+                d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18"
+                style="fill:#ffffff; stroke:#000000;" />
+                <path
+                d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10"
+                style="fill:#ffffff; stroke:#000000;" />
+                <path
+                d="M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z"
+                style="fill:#000000; stroke:#000000;" />
+                <path
+                d="M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z"
+                transform="matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)"
+                style="fill:#000000; stroke:#000000;" />
+            </g>
+        </svg>`
+
+        const buildPiece = (buildSvg) => {
+            const element = document.createElement('div')
+            element.innerHTML = buildSvg()
+            element.className = 'piece'
+            return element
+        }
+
+        const getPositionBySquare = (square) => {
+            const row = square.getAttribute(ATTR_ROW)
+            const col = square.getAttribute(ATTR_COL)
+            return [Number(row), Number(col)]
+        }
+
+        const placePiece = (piece, squareLabel) => {
+            const square = selectSquare(squareLabel)
+            piece.position = getPositionBySquare(square)
+            square.appendChild(piece.element)
+
+            updateGameProgress(squareLabel)
+        }
+
+        const updateGameProgress = (visitedSquare) => {
+            if (visitedSquare === visitOrder[game.nextIndexToVisit]) {
+                document.querySelector('#latest-visited').innerHTML = visitedSquare
+
+                while (true) {
+                    game.nextIndexToVisit++
+                    const nextToVisit = visitOrder[game.nextIndexToVisit]
+                    if (!nextToVisit) {
+                        gameover('Victory!')
+                        return
+                    }
+                    const nextPositionToVisit = getPositionBySquare(selectSquare(nextToVisit))
+                    const nextPositionToVisitLabel = selectSquare(nextToVisit).getAttribute(ATTR_LABEL)
+                    if (!isLegalMove(Moves.q, Piece.q.position, nextPositionToVisit) && nextPositionToVisitLabel !== INITIAL_Q_SQUARE) {
+                        break
+                    }
+                }
+            }
+        }
+
+        const incrementMovesCount = () => {
+            game.moves++
+            showMovesCount()
+        }
+
+        const showMovesCount = () => document.querySelector('#moves-count').innerText = game.moves
+
+        const isLegalMove = (moves, [fromRow, fromCol], [toRow, toCol]) => moves.some(([deltaRow, deltaCol]) => fromRow + deltaRow === toRow && fromCol + deltaCol === toCol)
+
+        const tryToMove = function () {
+            if (!game) {
+                return
+            }
+
+            if (!game.startedAt) {
+                startTimer()
+            }
+
+            const label = this.getAttribute(ATTR_LABEL)
+
+            if (!isLegalMove(Moves.n, Piece.n.position, getPositionBySquare(this))) {
+                return
+            }
+
+            console.log(label)
+            incrementMovesCount()
+            placePiece(Piece.n, label)
+
+            if (this.getAttribute(ATTR_LABEL) === 'F5') {
+                gameover('Knife F5 also loses!')
+                return
+            }
+
+            if (isLegalMove(Moves.q, Piece.q.position, Piece.n.position)) {
+                gameover('Knight can be captured!')
+                return
+            }
+
+            if (this.getAttribute(ATTR_LABEL) === INITIAL_Q_SQUARE) {
+                gameover('Leave the Queen alone!')
+                return
+            }
+        }
+
+        const Moves = {
+            n: [
+                [-2, 1], [-2, -1],
+                [-1, 2], [-1, -2],
+                [1, 2], [1, -2],
+                [2, 1], [2, -1],
+            ],
+            q: (() => {
+                const moves = []
+                for (let distance = 1; distance < BOARD_SIZE - 1; distance++) {
+                    moves.push([0, distance])
+                    moves.push([0, -distance])
+                    moves.push([distance, 0])
+                    moves.push([-distance, 0])
+                    moves.push([distance, distance])
+                    moves.push([-distance, -distance])
+                    moves.push([distance, -distance])
+                    moves.push([-distance, distance])
+                }
+                return moves
+            })(),
+        }
+
+        const Piece = {
+            n: {
+                element: buildPiece(buildWhiteKnight),
+                position: null,
+            },
+            q: {
+                element: buildPiece(buildBlackQueen),
+                position: null,
+            },
+        }
+
+        const visitOrder = (() => {
+            const labels = []
+            for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+                for (let col = BOARD_SIZE - 1; col >= 0; col--) {
+                    labels.push(getSquareLabel(row, col))
+                }
+            }
+            // return ['H8', 'G8', 'F8']
+            return labels
+        })()
+
+        let game = null
+
+        const reset = () => {
+            setStatus('')
+
+            game = {
+                nextIndexToVisit: 0,
+                moves: 0,
+            }
+            showMovesCount()
+            showTimer('0:00:00')
+
+            placePiece(Piece.q, INITIAL_Q_SQUARE)
+            placePiece(Piece.n, INITIAL_N_SQUARE)
+        }
+
+        const init = () => {
+            const board = selectBoardElement()
+            for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+                for (let col = 0; col < BOARD_SIZE; col++) {
+                    const square = buildSquareElement(row, col)
+                    board.appendChild(square)
+                }
+            }
+
+            reset()
+        }
+
+        const gameover = (reason) => {
+            if (!game) {
+                return
+            }
+
+            clearInterval(game.timer)
+            setStatus(reason)
+            showOverlay()
+
+            game = null
+        }
+
+        const zeroPad = (n) => n < 10 ? `0${n}` : n
+
+        const showTimer = (t) => document.querySelector('#time-elapsed').innerHTML = t
+
+        const startTimer = () => {
+            game.startedAt = Date.now()
+            game.timer = setInterval(() => {
+                const diff = game.startedAt ? Date.now() - game.startedAt : 0
+                const diffSeconds = Math.round(diff / 1e3)
+                const seconds = diffSeconds % 60
+                const minutes = Math.floor(diffSeconds / 60) % 60
+                const hours = Math.floor(diffSeconds / 3600)
+
+                showTimer(`${hours}:${zeroPad(minutes)}:${zeroPad(seconds)}`)
+            }, 50)
+        }
+
+        const selectOverlay = () => document.querySelector('.overlay')
+        const hideOverlay = () => selectOverlay().style.display = 'none'
+        const showOverlay = () => selectOverlay().style.display = 'block'
+
+        const setStatus = (text) => document.querySelector('#status').innerText = text
+    </script>
+</head>
+
+<body onload="init()">
+    <div class="wrap">
+        <div class="score">
+            <div><small>Last: </small><span id="latest-visited">-</span></div>
+            <div><small>Moves: </small><span id="moves-count">-</span></div>
+            <div><small>Time: </small><span id="time-elapsed"></span></div>
+        </div>
+        <div class="board"></div>
+        <div class="overlay" onclick="reset(); hideOverlay();">
+            <div id="status"></div><br>
+
+            Click to start the game!
+
+            <br><br><br><br>
+            <ol>
+                <li>Move the Knight by clicking on squares</li>
+                <li>Visit all squares in order H8 ... A8, H7 ... A7 ... A1</li>
+                <li>Skip squares attacked by the Queen</li>
+                <li>Do not capture the Queen</li>
+            </ol>
+        </div>
+    </div>
+</body>
+
+</html>
