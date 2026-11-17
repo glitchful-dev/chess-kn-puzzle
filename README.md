@@ -37,7 +37,7 @@ To take a new design system release: `pnpm add https://ds.glitchful.dev/pkg/ds-c
 This repo builds the image and glitchful-dev/home-lab runs it, under home-lab's
 `docs/08-app-image-standard.md`.
 
-1. Merge to `main`. `.github/workflows/image.yml` builds `ghcr.io/glitchful-dev/site-chess-kn-puzzle`,
+1. Merge to `master`. `.github/workflows/image.yml` builds `ghcr.io/glitchful-dev/site-chess-kn-puzzle`,
    tagged with the commit SHA, and prints the full reference in the run summary.
 2. In home-lab, put that reference on the `image:` line of `apps/site-chess-kn-puzzle/compose.yaml`
    and merge. All three servers pick it up within about 5 minutes.
