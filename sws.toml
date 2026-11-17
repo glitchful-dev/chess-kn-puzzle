@@ -1,0 +1,24 @@
+# static-web-server. The whole site is one self-contained index.html (see
+# vite.config.ts), so nothing is cached long-term and there are no app routes:
+# anything that isn't a file is a real 404.
+
+[general]
+host = "0.0.0.0"
+port = 8080
+root = "/public"
+compression-static = true
+compression = false
+cache-control-headers = false
+
+[advanced]
+
+[[advanced.headers]]
+source = "**"
+[advanced.headers.headers]
+Cache-Control = "no-cache"
+X-Content-Type-Options = "nosniff"
+
+[[advanced.headers]]
+source = "/healthz"
+[advanced.headers.headers]
+Content-Type = "text/plain; charset=utf-8"
