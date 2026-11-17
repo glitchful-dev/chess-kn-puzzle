@@ -1,0 +1,228 @@
+/*
+ * Layout and the board. Every colour, space, radius and type size is a design-system
+ * token (https://ds.glitchful.dev/llms-full.txt); components keep their own look.
+ */
+
+/* Header */
+.kp-brand {
+  display: inline-grid;
+  place-items: center;
+  width: var(--ds-control-h-md);
+  height: var(--ds-control-h-md);
+  border-radius: var(--ds-radius-2);
+  background: var(--ds-accent);
+  color: var(--ds-fg-on-accent);
+}
+.kp-brand .kp-piece { width: 80%; height: 80%; }
+.kp-brand .kp-piece__body { fill: currentColor; stroke: currentColor; }
+.kp-brand .kp-piece__eye { fill: var(--ds-accent); stroke: var(--ds-accent); }
+.kp-title {
+  margin: 0;
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-tight);
+  white-space: nowrap;
+}
+
+/* Page: the board on the left, notes on the right */
+.kp-layout {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--ds-space-7);
+  height: 100%;
+  padding: var(--ds-space-7);
+}
+.kp-stage {
+  container-type: size;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+.kp-play {
+  --kp-score-h: calc(var(--ds-space-9) + var(--ds-space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  width: min(100cqw, 100cqh - var(--kp-score-h) - var(--ds-space-5));
+}
+.kp-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-6);
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Score strip above the board */
+.kp-score {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-content: end;
+  gap: var(--ds-space-4) var(--ds-space-6);
+  height: var(--kp-score-h);
+}
+.kp-score__progress { grid-column: 1 / -1; }
+.kp-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+.kp-stat__value {
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-medium);
+  line-height: var(--ds-leading-tight);
+  white-space: nowrap;
+}
+.kp-stat__value[data-accent] { color: var(--ds-accent-fg); }
+
+/* Board */
+.kp-board {
+  display: grid;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  width: 100%;
+  aspect-ratio: 1;
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-2);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.kp-board__rank {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+.kp-square {
+  --_bg: var(--ds-surface-raised);
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--_bg);
+  color: var(--ds-fg);
+  font: inherit;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+.kp-square[data-shade="dark"] { --_bg: var(--ds-surface-sunken); }
+.kp-square[data-legal] { cursor: pointer; }
+
+/* ::before tints the square for what it means; ::after outlines it. */
+.kp-square::before,
+.kp-square::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-out),
+    box-shadow var(--ds-duration-fast) var(--ds-ease-out);
+}
+.kp-square[data-target]::before { background: var(--ds-selected); }
+.kp-square[data-target]::after { box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent); }
+.kp-square[data-attacked]::before { background: var(--ds-danger-soft); }
+.kp-square[data-lost]::after { box-shadow: inset 0 0 0 var(--ds-focus-ring-width) var(--ds-danger); }
+.kp-square[data-legal]:hover::after { background: var(--ds-hover); }
+.kp-square[data-legal]:active::after { background: var(--ds-active); }
+.kp-square:focus-visible {
+  z-index: 1;
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: calc(-1 * var(--ds-focus-ring-width));
+}
+
+.kp-square__rank,
+.kp-square__file {
+  position: absolute;
+  font-family: var(--ds-font-mono);
+  font-size: var(--ds-text-2xs);
+  line-height: 1;
+  color: var(--ds-fg-subtle);
+}
+.kp-square__rank { top: var(--ds-space-2); left: var(--ds-space-2); }
+.kp-square__file { right: var(--ds-space-2); bottom: var(--ds-space-2); }
+
+.kp-square__dot {
+  width: 26%;
+  aspect-ratio: 1;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-fg-subtle);
+  opacity: 0.45;
+}
+.kp-square__visited {
+  position: absolute;
+  top: var(--ds-space-2);
+  right: var(--ds-space-2);
+  width: 24%;
+  height: 24%;
+  color: var(--ds-success-fg);
+}
+
+/* Pieces: the SVGs carry shapes only; colour comes from here, so both themes work. */
+.kp-piece {
+  position: relative;
+  z-index: 1;
+  width: 88%;
+  height: 88%;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.kp-piece[data-piece="queen"] .kp-piece__body { fill: var(--ds-fg); stroke: var(--ds-fg); }
+.kp-piece[data-piece="queen"] .kp-piece__crown { stroke: none; }
+.kp-piece[data-piece="queen"] .kp-piece__outline { fill: none; }
+.kp-piece[data-piece="queen"] .kp-piece__detail { fill: none; stroke: var(--ds-surface-raised); }
+.kp-piece[data-piece="knight"] .kp-piece__body { fill: var(--ds-surface-raised); stroke: var(--ds-fg); }
+.kp-piece[data-piece="knight"] .kp-piece__eye { fill: var(--ds-fg); stroke: var(--ds-fg); }
+
+/* Notes */
+.kp-prose ol {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0 0 var(--ds-space-5);
+  padding-left: var(--ds-space-6);
+}
+.kp-prose p { margin: 0; }
+.kp-keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--ds-space-4) var(--ds-space-5);
+  margin: 0;
+}
+.kp-keys dt { display: flex; gap: var(--ds-space-1); }
+.kp-keys dd { margin: 0; color: var(--ds-fg-muted); }
+.kp-hint { color: var(--ds-fg-muted); }
+
+/* Result dialog */
+.kp-result {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ds-space-5);
+  margin: 0;
+}
+.kp-result dd {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-2) 0 0;
+  font-size: var(--ds-text-xl);
+}
+
+/* Phones: one column, the board as wide as the screen allows */
+@media (max-width: 719px) {
+  .kp-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-7);
+    height: auto;
+    padding: var(--ds-space-5);
+  }
+  .kp-stage { container-type: inline-size; }
+  .kp-play { width: min(100cqw, 100svh - 220px); }
+  .kp-subtitle { display: none; }
+  .kp-panel { overflow: visible; }
+}
