@@ -95,6 +95,7 @@ export function Board({ game, cursor, onCursorChange, onPick, showMoves, showAtt
                 data-legal={legal || undefined}
                 data-attacked={attacked || undefined}
                 data-lost={sq === lost || undefined}
+                data-selected={(hasKnight && sq !== lost) || undefined}
                 aria-label={name}
                 tabIndex={sq === cursor ? 0 : -1}
                 onClick={() => onPick(sq)}

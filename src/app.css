@@ -136,6 +136,10 @@
 }
 .kp-square[data-attacked]::before { background: color-mix(in oklch, var(--ds-danger) 32%, transparent); }
 .kp-square[data-lost]::after { box-shadow: inset 0 0 0 var(--ds-focus-ring-width) var(--ds-danger); }
+/* The knight is the player's only piece, so its square always reads as selected. */
+.kp-square[data-selected]::before {
+  background: var(--ds-board-selected, oklch(0.55 var(--ds-accent-c) var(--ds-accent-h) / 0.45));
+}
 .kp-square[data-legal]:hover::after { background: var(--ds-hover); }
 .kp-square[data-legal]:active::after { background: var(--ds-active); }
 .kp-square:focus-visible {

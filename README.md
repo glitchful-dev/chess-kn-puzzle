@@ -15,7 +15,8 @@ Built on the Glitchful design system ([ds.glitchful.dev](https://ds.glitchful.de
 unless the header's theme switch says otherwise.
 
 The board is grey and purple (`--ds-board-light` / `--ds-board-dark`) and looks the same in both
-themes, like a real board. Hints (the knight's moves, the queen's attacks) start off. There are no
+themes, like a real board. The knight's square is tinted (`--ds-board-selected`) so it reads as
+yours. Hints (the knight's moves, the queen's attacks) start off. There are no
 keyboard shortcuts; the board is still reachable with Tab, arrows and Enter. Options and best
 scores are kept in `localStorage`.
 
