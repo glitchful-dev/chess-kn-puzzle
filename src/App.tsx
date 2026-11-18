@@ -1,11 +1,11 @@
 import {
-  AppShell, Badge, Button, Card, CardBody, CardHeader, Dialog, Icon, Kbd, ProgressBar,
-  SegmentedControl, StatusBar, StatusBarItem, Switch, isTextField, useTheme, type StatusTone,
+  AppShell, Badge, Button, Card, CardBody, CardHeader, Dialog, Icon, ProgressBar,
+  SegmentedControl, StatusBar, StatusBarItem, Switch, useTheme, type StatusTone,
 } from '@glitchful-dev/ds-ui';
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
-import { Board, focusSquare } from './Board.tsx';
+import { useCallback, useEffect, useState } from 'preact/hooks';
+import { Board } from './Board.tsx';
 import {
-  PAR, QUEEN, START, TARGETS, currentTarget, formatTime, labelOf, move, newGame, parseSquare,
+  PAR, QUEEN, START, TARGETS, currentTarget, formatTime, labelOf, move, newGame,
   visitedCount, type Game, type LossReason, type Square,
 } from './game.ts';
 import { Knight } from './pieces.tsx';
@@ -24,8 +24,6 @@ const LOSS_TITLES: Record<LossReason, string> = {
   queen: 'Leave the Queen alone!',
 };
 
-const TYPE_TIMEOUT_MS = 1500;
-
 export function App() {
   const [game, setGame] = useState<Game>(newGame);
   const [cursor, setCursor] = useState<Square>(START);
@@ -37,10 +35,8 @@ export function App() {
   const [announcement, setAnnouncement] = useState('');
   const [newBest, setNewBest] = useState<{ moves: boolean; ms: boolean }>({ moves: false, ms: false });
   const [settings, setSettings] = useState<Settings>(() =>
-    load<Settings>(SETTINGS_KEY, { showMoves: true, showAttacks: false }));
+    load<Settings>(SETTINGS_KEY, { showMoves: false, showAttacks: false }));
   const [best, setBest] = useState<Best>(() => load<Best>(BEST_KEY, { moves: null, ms: null }));
-  const boardRef = useRef<HTMLDivElement>(null);
-  const typed = useRef<{ file: string; at: number } | null>(null);
 
   const playing = startedAt !== null && game.outcome === null;
   const elapsed = startedAt === null ? 0 : (finishedAt ?? now) - startedAt;
@@ -73,7 +69,7 @@ export function App() {
       setAnnouncement(text);
     };
     if (game.outcome) {
-      refuse('Game over. Press R to play again.');
+      refuse('Game over. Restart to play again.');
       return;
     }
     const next = move(game, sq);
@@ -107,41 +103,6 @@ export function App() {
       save(BEST_KEY, updated);
     }
   }, [game, startedAt, best]);
-
-  // The document listener below is registered once. Preact runs effects after paint, so
-  // re-registering it per render would let a quick keystroke reach a stale `pick`.
-  const pickRef = useRef(pick);
-  pickRef.current = pick;
-
-  // R restarts; typing a square ("g6") moves there. Not while a dialog or text field has focus.
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
-      const target = e.target as Element | null;
-      if (isTextField(target) || target?.closest?.('dialog')) return;
-      const key = e.key.toLowerCase();
-      if (key === 'r') {
-        e.preventDefault();
-        restart();
-        return;
-      }
-      if (/^[a-h]$/.test(key)) {
-        typed.current = { file: key, at: Date.now() };
-        return;
-      }
-      const pending = typed.current;
-      typed.current = null;
-      if (/^[1-8]$/.test(key) && pending && Date.now() - pending.at < TYPE_TIMEOUT_MS) {
-        const sq = parseSquare(pending.file + key);
-        if (sq === null) return;
-        e.preventDefault();
-        if (boardRef.current?.contains(document.activeElement)) focusSquare(boardRef.current, sq);
-        pickRef.current(sq);
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [restart]);
 
   const visited = visitedCount(game);
   const target = currentTarget(game);
@@ -191,16 +152,14 @@ export function App() {
                 tone={outcome?.kind === 'won' ? 'success' : outcome ? 'danger' : 'accent'}
               />
             </div>
-            <div ref={boardRef}>
-              <Board
-                game={game}
-                cursor={cursor}
-                onCursorChange={setCursor}
-                onPick={pick}
-                showMoves={settings.showMoves}
-                showAttacks={settings.showAttacks}
-              />
-            </div>
+            <Board
+              game={game}
+              cursor={cursor}
+              onCursorChange={setCursor}
+              onPick={pick}
+              showMoves={settings.showMoves}
+              showAttacks={settings.showAttacks}
+            />
           </div>
         </section>
 
@@ -233,18 +192,6 @@ export function App() {
               <Switch checked={settings.showAttacks} onCheckedChange={(v) => updateSettings({ showAttacks: v })}>
                 Show the queen's attacks
               </Switch>
-            </CardBody>
-          </Card>
-
-          <Card as="section">
-            <CardHeader>Keyboard</CardHeader>
-            <CardBody>
-              <dl class="kp-keys">
-                <dt><Kbd>←</Kbd><Kbd>↑</Kbd><Kbd>→</Kbd><Kbd>↓</Kbd></dt><dd>Move the cursor</dd>
-                <dt><Kbd>Enter</Kbd></dt><dd>Move the knight there</dd>
-                <dt><Kbd>G</Kbd><Kbd>6</Kbd></dt><dd>Type a square to move to it</dd>
-                <dt><Kbd>R</Kbd></dt><dd>Restart</dd>
-              </dl>
             </CardBody>
           </Card>
         </aside>
@@ -317,7 +264,7 @@ function Header({ onRestart }: { onRestart: () => void }) {
       <h1 class="kp-title">Knight puzzle</h1>
       <span class="ds-label kp-subtitle">Queen {labelOf(QUEEN)}</span>
       <span class="ds-spacer" />
-      <Button size="sm" kbd="R" onClick={onRestart}>Restart</Button>
+      <Button size="sm" onClick={onRestart}>Restart</Button>
       <SegmentedControl
         size="sm"
         label="Theme"

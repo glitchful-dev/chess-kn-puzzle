@@ -84,7 +84,6 @@
   grid-template-rows: repeat(8, minmax(0, 1fr));
   width: 100%;
   aspect-ratio: 1;
-  border: var(--ds-border-width) solid var(--ds-border-strong);
   border-radius: var(--ds-radius-2);
   overflow: hidden;
   user-select: none;
@@ -94,8 +93,14 @@
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
 }
+/*
+ * Square colours are --ds-board-light / --ds-board-dark (ds-css 0.1.5). The fallbacks are the
+ * same values, for as long as this app is on 0.1.4; delete them after upgrading. --_ink is the
+ * other square's colour, for the coordinates drawn on a square.
+ */
 .kp-square {
-  --_bg: var(--ds-surface-raised);
+  --_bg: var(--ds-board-light, oklch(0.957 0.002 146));
+  --_ink: var(--ds-board-dark, oklch(0.602 0.095 292));
   position: relative;
   display: grid;
   place-items: center;
@@ -110,7 +115,10 @@
   cursor: default;
   -webkit-tap-highlight-color: transparent;
 }
-.kp-square[data-shade="dark"] { --_bg: var(--ds-surface-sunken); }
+.kp-square[data-shade="dark"] {
+  --_bg: var(--ds-board-dark, oklch(0.602 0.095 292));
+  --_ink: var(--ds-board-light, oklch(0.957 0.002 146));
+}
 .kp-square[data-legal] { cursor: pointer; }
 
 /* ::before tints the square for what it means; ::after outlines it. */
@@ -123,9 +131,10 @@
   transition: background-color var(--ds-duration-fast) var(--ds-ease-out),
     box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
-.kp-square[data-target]::before { background: var(--ds-selected); }
-.kp-square[data-target]::after { box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent); }
-.kp-square[data-attacked]::before { background: var(--ds-danger-soft); }
+.kp-square[data-target]::after {
+  box-shadow: inset 0 0 0 calc(var(--ds-focus-ring-width) + var(--ds-border-width)) var(--ds-fg);
+}
+.kp-square[data-attacked]::before { background: color-mix(in oklch, var(--ds-danger) 32%, transparent); }
 .kp-square[data-lost]::after { box-shadow: inset 0 0 0 var(--ds-focus-ring-width) var(--ds-danger); }
 .kp-square[data-legal]:hover::after { background: var(--ds-hover); }
 .kp-square[data-legal]:active::after { background: var(--ds-active); }
@@ -140,8 +149,9 @@
   position: absolute;
   font-family: var(--ds-font-mono);
   font-size: var(--ds-text-2xs);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
-  color: var(--ds-fg-subtle);
+  color: var(--_ink);
 }
 .kp-square__rank { top: var(--ds-space-2); left: var(--ds-space-2); }
 .kp-square__file { right: var(--ds-space-2); bottom: var(--ds-space-2); }
@@ -150,16 +160,8 @@
   width: 26%;
   aspect-ratio: 1;
   border-radius: var(--ds-radius-full);
-  background: var(--ds-fg-subtle);
-  opacity: 0.45;
-}
-.kp-square__visited {
-  position: absolute;
-  top: var(--ds-space-2);
-  right: var(--ds-space-2);
-  width: 24%;
-  height: 24%;
-  color: var(--ds-success-fg);
+  background: var(--ds-fg);
+  opacity: 0.22;
 }
 
 /* Pieces: the SVGs carry shapes only; colour comes from here, so both themes work. */
@@ -187,15 +189,6 @@
   padding-left: var(--ds-space-6);
 }
 .kp-prose p { margin: 0; }
-.kp-keys {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: var(--ds-space-4) var(--ds-space-5);
-  margin: 0;
-}
-.kp-keys dt { display: flex; gap: var(--ds-space-1); }
-.kp-keys dd { margin: 0; color: var(--ds-fg-muted); }
 .kp-hint { color: var(--ds-fg-muted); }
 
 /* Result dialog */

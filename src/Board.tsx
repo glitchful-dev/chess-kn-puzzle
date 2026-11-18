@@ -1,4 +1,3 @@
-import { Icon } from '@glitchful-dev/ds-ui';
 import type { TargetedKeyboardEvent } from 'preact';
 import { useRef } from 'preact/hooks';
 import {
@@ -21,12 +20,15 @@ interface BoardProps {
 const RANKS = Array.from({ length: SIZE }, (_, i) => SIZE - 1 - i); // 8 at the top
 const FILES = Array.from({ length: SIZE }, (_, i) => i);
 
-export const focusSquare = (board: Element | null, sq: Square) =>
+const focusSquare = (board: Element | null, sq: Square) =>
   board?.querySelector<HTMLButtonElement>(`[data-sq="${sq}"]`)?.focus();
 
 /**
  * The board: an ARIA grid of 64 buttons with one tab stop. Arrows move the cursor,
  * Home/End go to the ends of the rank, PageUp/PageDown to the ends of the file.
+ *
+ * Its squares keep the same colours in both themes, like a real board, so it is pinned to
+ * the light theme: pieces, marks and focus rings inside it then read against those squares.
  */
 export function Board({ game, cursor, onCursorChange, onPick, showMoves, showAttacks }: BoardProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -61,7 +63,7 @@ export function Board({ game, cursor, onCursorChange, onPick, showMoves, showAtt
   };
 
   return (
-    <div class="kp-board" role="grid" aria-label="Board" ref={ref} onKeyDown={onKeyDown}>
+    <div class="kp-board" data-theme="light" role="grid" aria-label="Board" ref={ref} onKeyDown={onKeyDown}>
       {RANKS.map((rank) => (
         <div class="kp-board__rank" role="row" key={rank}>
           {FILES.map((file) => {
@@ -100,7 +102,6 @@ export function Board({ game, cursor, onCursorChange, onPick, showMoves, showAtt
               >
                 {file === 0 && <span class="kp-square__rank" aria-hidden="true">{rank + 1}</span>}
                 {rank === 0 && <span class="kp-square__file" aria-hidden="true">{'ABCDEFGH'[file]}</span>}
-                {visited && <Icon name="check" className="kp-square__visited" />}
                 {hasQueen && <Queen />}
                 {hasKnight && <Knight />}
                 {legal && !hasKnight && !hasQueen && <span class="kp-square__dot" aria-hidden="true" />}
