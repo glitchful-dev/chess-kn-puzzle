@@ -9,7 +9,7 @@ Live at **https://chess-kn-puzzle.glitchful.dev** once home-lab pins an image (s
 ## UI
 
 Built on the Glitchful design system ([ds.glitchful.dev](https://ds.glitchful.dev),
-`@glitchful-dev/ds-css` and `@glitchful-dev/ds-ui` 0.1.4) with Preact: `AppShell`, `StatusBar`,
+`@glitchful-dev/ds-css` and `@glitchful-dev/ds-ui` 0.1.5) with Preact: `AppShell`, `StatusBar`,
 `Card`, `Switch`, `SegmentedControl`, `Dialog`, `ProgressBar`, `Badge`. App CSS in
 `src/app.css` uses `var(--ds-*)` tokens, so light and dark themes both work and follow the OS
 unless the header's theme switch says otherwise.

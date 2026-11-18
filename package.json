@@ -14,8 +14,8 @@
     "check": "pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
-    "@glitchful-dev/ds-css": "https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz",
-    "@glitchful-dev/ds-ui": "https://ds.glitchful.dev/pkg/ds-ui-0.1.4.tgz",
+    "@glitchful-dev/ds-css": "https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz",
+    "@glitchful-dev/ds-ui": "https://ds.glitchful.dev/pkg/ds-ui-0.1.5.tgz",
     "preact": "^11.2.0"
   },
   "devDependencies": {

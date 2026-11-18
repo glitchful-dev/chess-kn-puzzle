@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@glitchful-dev/ds-css':
-        specifier: https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz
-        version: https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz
+        specifier: https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz
+        version: https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz
       '@glitchful-dev/ds-ui':
-        specifier: https://ds.glitchful.dev/pkg/ds-ui-0.1.4.tgz
-        version: https://ds.glitchful.dev/pkg/ds-ui-0.1.4.tgz(@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz)(react@19.3.1)
+        specifier: https://ds.glitchful.dev/pkg/ds-ui-0.1.5.tgz
+        version: https://ds.glitchful.dev/pkg/ds-ui-0.1.5.tgz(@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz)(react@19.3.1)
       preact:
         specifier: ^11.2.0
         version: 11.2.0
@@ -138,16 +138,16 @@ packages:
   '@emnapi/wasi-threads@2.2.0':
     resolution: {integrity: sha512-JP7OYH38Q7+pyTAe14raZHLQIK7BDKbdwji+Xi3pcd/6QkJYQH3SX4wu6EplGrGJWRepoNzedfm0G3B9Z4e9Rw==}
 
-  '@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz':
-    resolution: {integrity: sha512-P0CDuCwAOm4fRSL/gDBhbwt26w/GwArFSfO0g3r9/f3iPXEkx6ADzhhqDzv5Rcewv4g9qkeyzZBXXEpHhHTwpg==, tarball: https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz}
-    version: 0.1.4
+  '@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz':
+    resolution: {integrity: sha512-0/nLhXpqnm4m8I86RxY3901RWAz4LtiMTWTyO7wi1sgTGC5NbJhinB9i6VFl1PRLGfv9+0hCTxt2Z3eNcRcpYw==, tarball: https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz}
+    version: 0.1.5
     hasBin: true
 
-  '@glitchful-dev/ds-ui@https://ds.glitchful.dev/pkg/ds-ui-0.1.4.tgz':
-    resolution: {integrity: sha512-NSviJlUTr/p4FyJcplz1Ppes7sgq0RzLzN2SVZsAXc0CtTLwaE3JTYJO4Wigoi6TTruk64Gkuhe1pof95dZXBw==, tarball: https://ds.glitchful.dev/pkg/ds-ui-0.1.4.tgz}
-    version: 0.1.4
+  '@glitchful-dev/ds-ui@https://ds.glitchful.dev/pkg/ds-ui-0.1.5.tgz':
+    resolution: {integrity: sha512-rEHBCvtAmHutqyIGy5qTsciOK44nXgO28B7UX8SQsmr/uuybNDKupO2MhbF9Yw2WEj4rbjcjutEzZSlGNF/PQQ==, tarball: https://ds.glitchful.dev/pkg/ds-ui-0.1.5.tgz}
+    version: 0.1.5
     peerDependencies:
-      '@glitchful-dev/ds-css': ^0.1.4
+      '@glitchful-dev/ds-css': ^0.1.5
       react: '>=18'
 
   '@jridgewell/gen-mapping@0.3.13':
@@ -927,11 +927,11 @@ snapshots:
       tslib: 2.9.1
     optional: true
 
-  '@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz': {}
+  '@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz': {}
 
-  '@glitchful-dev/ds-ui@https://ds.glitchful.dev/pkg/ds-ui-0.1.4.tgz(@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz)(react@19.3.1)':
+  '@glitchful-dev/ds-ui@https://ds.glitchful.dev/pkg/ds-ui-0.1.5.tgz(@glitchful-dev/ds-css@https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz)(react@19.3.1)':
     dependencies:
-      '@glitchful-dev/ds-css': https://ds.glitchful.dev/pkg/ds-css-0.1.4.tgz
+      '@glitchful-dev/ds-css': https://ds.glitchful.dev/pkg/ds-css-0.1.5.tgz
       react: 19.3.1
 
   '@jridgewell/gen-mapping@0.3.13':
