@@ -9,13 +9,16 @@ Live at **https://chess-kn-puzzle.glitchful.dev** once home-lab pins an image (s
 ## UI
 
 Built on the Glitchful design system ([ds.glitchful.dev](https://ds.glitchful.dev),
-`@glitchful-dev/ds-css` and `@glitchful-dev/ds-ui` 0.1.4) with Preact: `AppShell`, `StatusBar`,
-`Card`, `Switch`, `SegmentedControl`, `Dialog`, `ProgressBar`, `Kbd`, `Badge`. App CSS in
-`src/app.css` uses `var(--ds-*)` tokens only, so light and dark themes both work and follow the OS
+`@glitchful-dev/ds-css` and `@glitchful-dev/ds-ui` 0.1.5) with Preact: `AppShell`, `StatusBar`,
+`Card`, `Switch`, `SegmentedControl`, `Dialog`, `ProgressBar`, `Badge`. App CSS in
+`src/app.css` uses `var(--ds-*)` tokens, so light and dark themes both work and follow the OS
 unless the header's theme switch says otherwise.
 
-Keyboard: arrows move the cursor over the board, Enter moves the knight, typing a square (`g6`)
-moves straight there, and `R` restarts. Options and best scores are kept in `localStorage`.
+The board is grey and purple (`--ds-board-light` / `--ds-board-dark`) and looks the same in both
+themes, like a real board. The knight's square is tinted (`--ds-board-selected`) so it reads as
+yours. Hints (the knight's moves, the queen's attacks) start off. There are no
+keyboard shortcuts; the board is still reachable with Tab, arrows and Enter. Options and best
+scores are kept in `localStorage`.
 
 ## Develop
 
